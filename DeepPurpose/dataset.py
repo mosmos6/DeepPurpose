@@ -569,3 +569,30 @@ def load_MMP9():
 	target = 'MSLWQPLVLVLLVLGCCFAAPRQRQSTLVLFPGDLRTNLTDRQLAEEYLYRYGYTRVAEMRGESKSLGPALLLLQKQLSLPETGELDSATLKAMRTPRCGVPDLGRFQTFEGDLKWHHHNITYWIQNYSEDLPRAVIDDAFARAFALWSAVTPLTFTRVYSRDADIVIQFGVAEHGDGYPFDGKDGLLAHAFPPGPGIQGDAHFDDDELWSLGKGVVVPTRFGNADGAACHFPFIFEGRSYSACTTDGRSDGLPWCSTTANYDTDDRFGFCPSERLYTQDGNADGKPCQFPFIFQGQSYSACTTDGRSDGYRWCATTANYDRDKLFGFCPTRADSTVMGGNSAGELCVFPFTFLGKEYSTCTSEGRGDGRLWCATTSNFDSDKKWGFCPDQGYSLFLVAAHEFGHALGLDHSSVPEALMYPMYRFTEGPPLHKDDVNGIRHLYGPRPEPEPRPPTTTTPQPTAPPTVCPTGPPTVHPSERPTAGPTGPPSAGPTGPPTAGPSTATTVPLSPVDDACNVNIFDAIAEIGNQLYLFKDGKYWRFSEGRGSRPQGPFLIADKWPALPRKLDSVFEERLSKKLFFFSGRQVWVYTGASVLGPRRLDKLGLGADVAQVTGALRSGRGKMLLFSGRRLWRFDVKAQMVDPRSASEVDRMFPGVPLDTHDVFQYREKAYFCQDRFYWRVSSRSELNQVDQVGYVTYDILQCPED'
 	target_name = 'MMP9'
 	return target, target_name
+
+def load_bindingdb_covid_tsv(tsv_path, affinity_column='Ki (nM)', dropna=True):
+    """
+    Custom loader for BindingDB COVID-19 TSV data.
+    Converts to DeepPurpose format: [SMILES, Target sequence, Affinity]
+    """
+    df = pd.read_csv(tsv_path, sep='\t')
+
+    # Drop rows missing SMILES, target, or affinity
+    df = df[['Ligand SMILES', 'BindingDB Target Chain Sequence', affinity_column]].dropna()
+
+    # Filter invalid entries
+    df = df[df['Ligand SMILES'].apply(lambda x: isinstance(x, str) and len(x) > 0)]
+    df = df[df['BindingDB Target Chain Sequence'].apply(lambda x: isinstance(x, str) and len(x) > 0)]
+    df = df[df[affinity_column].apply(lambda x: isinstance(x, (int, float)) or str(x).replace('.', '', 1).isdigit())]
+
+    # Rename columns for DeepPurpose
+    df.columns = ['SMILES', 'Target Sequence', 'Affinity']
+
+    # Convert affinity to float and nanomolar to molar (optional)
+    df['Affinity'] = df['Affinity'].astype(float) * 1e-9  # from nM to M
+
+    if dropna:
+        df = df.dropna()
+
+    print(f"✅ Loaded {len(df)} valid compound-target pairs from BindingDB COVID TSV.")
+    return df
