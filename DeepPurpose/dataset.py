@@ -24,31 +24,19 @@ We use some existing files from https://github.com/yangkevin2/coronavirus_data
 We use the SMILES, protein sequence from DeepDTA github repo: https://github.com/hkmztrk/DeepDTA/tree/master/data.
 '''
 
-def load_bindingdb_covid_tsv(tsv_path, affinity_column='Ki (nM)', dropna=True):
+def load_bindingdb_covid_tsv(tsv_path):
     """
-    Custom loader for BindingDB COVID-19 TSV data.
-    Converts to DeepPurpose format: [SMILES, Target sequence, Affinity]
+    Final loader for already-processed BindingDB COVID-19 TSV.
+    Assumes the file has columns: SMILES, Target Sequence, Affinity (in molar).
     """
     df = pd.read_csv(tsv_path, sep='\t')
 
-    # Drop rows missing SMILES, target, or affinity
-    df = df[['Ligand SMILES', 'BindingDB Target Chain Sequence', affinity_column]].dropna()
+    # Final check for expected columns
+    expected_cols = ['SMILES', 'Target Sequence', 'Affinity']
+    if not all(col in df.columns for col in expected_cols):
+        raise ValueError(f"❌ Missing one or more required columns: {expected_cols}")
 
-    # Filter invalid entries
-    df = df[df['Ligand SMILES'].apply(lambda x: isinstance(x, str) and len(x) > 0)]
-    df = df[df['BindingDB Target Chain Sequence'].apply(lambda x: isinstance(x, str) and len(x) > 0)]
-    df = df[df[affinity_column].apply(lambda x: isinstance(x, (int, float)) or str(x).replace('.', '', 1).isdigit())]
-
-    # Rename columns for DeepPurpose
-    df.columns = ['SMILES', 'Target Sequence', 'Affinity']
-
-    # Convert affinity to float and nanomolar to molar (optional)
-    df['Affinity'] = df['Affinity'].astype(float) * 1e-9  # from nM to M
-
-    if dropna:
-        df = df.dropna()
-
-    print(f"✅ Loaded {len(df)} valid compound-target pairs from BindingDB COVID TSV.")
+    print(f"✅ Loaded {len(df)} cleaned entries from {tsv_path}")
     return df
 
 
