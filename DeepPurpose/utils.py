@@ -661,6 +661,8 @@ class data_process_loader(data.Dataset):
 		v_p = self.df.iloc[index]['target_encoding']
 		if self.config['target_encoding'] == 'CNN' or self.config['target_encoding'] == 'CNN_RNN':
 			v_p = protein_2_embed(v_p)
+		elif self.config['target_encoding'] == 'ProtTrans':
+                        v_p = torch.tensor(v_p, dtype=torch.float32)  # already a 1024-dim numpy array
 		y = self.labels[index]
 		return v_d, v_p, y
 
