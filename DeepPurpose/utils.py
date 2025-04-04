@@ -408,6 +408,9 @@ def encode_drug(df_data, drug_encoding, column_name = 'SMILES', save_column_name
 def encode_protein(df_data, target_encoding, column_name = 'Target Sequence', save_column_name = 'target_encoding'):
 	print('encoding protein...')
 	print('unique target sequence: ' + str(len(df_data[column_name].unique())))
+	if target_encoding == 'ProtTrans':
+		df['target_encoding'] = df['ProtTrans']
+		return df
 	if target_encoding == 'AAC':
 		print('-- Encoding AAC takes time. Time Reference: 24s for ~100 sequences in a CPU.\
 				 Calculate your time by the unique target sequence #, instead of the entire dataset.')
