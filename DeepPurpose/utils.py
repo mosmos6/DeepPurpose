@@ -530,6 +530,15 @@ def data_process(X_drug = None, X_target = None, y=None, drug_encoding=None, tar
 								inplace=True)
 		print('in total: ' + str(len(df_data)) + ' drug-drug pairs')
 
+		if target_encoding == 'ProtTrans':
+			try:
+				from __main__ import df  # grabs df from notebook
+                                df_data['ProtTrans'] = df.loc[df_data.index, 'ProtTrans'].values
+			except Exception as e:
+				print("⚠️ Could not inject ProtTrans embeddings into df_data:", e)
+
+
+
 
 	if sample_frac != 1:
 		df_data = df_data.sample(frac = sample_frac).reset_index(drop = True)
