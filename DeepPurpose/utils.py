@@ -996,6 +996,10 @@ def generate_config(drug_encoding = None, target_encoding = None,
 		base_config['transformer_attention_probs_dropout'] = transformer_attention_probs_dropout
 		base_config['transformer_hidden_dropout_rate'] = transformer_hidden_dropout_rate
 		base_config['hidden_dim_protein'] = transformer_emb_size_target
+	elif target_encoding == 'ProtTrans':
+		base_config['input_dim_protein'] = 1024  # each ProtTrans vector is 1024-dim
+		base_config['mlp_hidden_dims_target'] = mlp_hidden_dims_target  # standard MLP for now
+
 	elif target_encoding is None:
 		pass
 	else:
