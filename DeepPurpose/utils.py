@@ -410,6 +410,7 @@ def encode_protein(df_data, target_encoding, column_name = 'Target Sequence', sa
 	print('unique target sequence: ' + str(len(df_data[column_name].unique())))
 	if target_encoding == 'ProtTrans':
 		df_data['target_encoding'] = df_data['ProtTrans']
+		print("✅ It's read.")
 		print("✅ First target_encoding sample:", df_data['target_encoding'].iloc[0])
 		return df_data
 	if target_encoding == 'AAC':
