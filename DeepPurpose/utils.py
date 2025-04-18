@@ -470,7 +470,7 @@ def data_process(X_drug = None, X_target = None, y=None, drug_encoding=None, tar
 		DDI_flag = True
 		if (X_drug is None) or (X_drug_ is None):
 			raise AttributeError("Drug pair sequence should be in X_drug, X_drug_")
-	elif (X_target is not None) and (X_target_ is not None):
+	elif (X_drug is None) and (X_target is not None) and (X_target_ is not None):
 		PPI_flag = True
 		if (X_target is None) or (X_target_ is None):
 			raise AttributeError("Target pair sequence should be in X_target, X_target_")
